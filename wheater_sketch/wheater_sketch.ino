@@ -13,7 +13,7 @@
 #include <SFE_BMP180.h>
 #include <Wire.h>
 
-#define PINO_DS18B20 2
+#define PINO_DS18B20 2 // Temperatura do solo
 #define PINO_AM2302 3
 #define PINO_MOLHAMENTO_FOLIAR 0
 #define PINO_LUMINOSIDADE_SOLAR 1
@@ -67,11 +67,7 @@ void setup(void)
   
   dht.begin();
   
-  if (pressure.begin())
-  {
-    Serial.println("BMP180 init success");
-  }
-  else
+  if (!pressure.begin())
   {
     Serial.println("BMP180 init fail\n\n");
     while(1)
@@ -80,22 +76,23 @@ void setup(void)
     }
   }
   
-  if (SD.begin(chipSelect))
-  {
-    Serial.println("SD init success");
-  }
-  else
-  {
-    Serial.println("initialization failed!");
-    while(1)
-    {
-      delay(60000);
-    }
-  }
+  //if (SD.begin(chipSelect))
+  //{
+  //  Serial.println("SD init success");
+  //}
+  //else
+  //{
+  //  Serial.println("initialization failed!");
+  //  while(1)
+  //  {
+  //    delay(60000);
+  //  }
+  //}
 }
 
 void loop(void) 
 {
+  
   luminosidadeSolar = lerLuminosidadeSolar();
   molhamentoFoliar = lerMolhamentoFoliar();
   pressaoAtmosferica = lerPressaoAtmosferica();
@@ -104,9 +101,9 @@ void loop(void)
   temperaturaSolo = lerTemperaturaSolo();
   umidadeAr = lerUmidadeAr();
   umidadeSolo = lerUmidadeSolo();
-  
-  Serial.print("Contador = ");
-  Serial.println(contador);
+
+  //Serial.print("Contador = ");
+  //Serial.println(contador);
   
   /* Serial.print("Luminosidade Solar = ");
   Serial.println(luminosidadeSolar);
@@ -153,25 +150,27 @@ void loop(void)
   Serial.println("=========================");
   // Serial.println("");
   
-  myFile = SD.open("wheater.csv", FILE_WRITE);
-  myFile.println(dataString);
-  myFile.close();
+  //myFile = SD.open("wheater.csv", FILE_WRITE);
+  //myFile.println(dataString);
+  //myFile.close();
   
   contador++;
   
-  delay(60000);
+  delay(1500);
 }
 
 float lerLuminosidadeSolar()
 {
-  // 1023 = Sem luz
-  // 0 = Com luz
+  // 1023 = Sem luz / 0 = Com luz
+  // 79 = Com laterna do cel
+  // 1018 = Com fita isolante por cima
   return analogRead(PINO_LUMINOSIDADE_SOLAR);
 }
 
 float lerMolhamentoFoliar()
 {
-  // max 577
+  // max 577/877
+  // min 49/15
   return analogRead(PINO_MOLHAMENTO_FOLIAR);
 }
 
