@@ -105,26 +105,30 @@ void loop(void)
   //Serial.print("Contador = ");
   //Serial.println(contador);
   
-  /* Serial.print("Luminosidade Solar = ");
+  Serial.print("Luminosidade Solar = ");
   Serial.println(luminosidadeSolar);
   
   Serial.print("Molhamento Foliar = ");
   Serial.println(molhamentoFoliar);
   
   Serial.print("Temperatura do ar = ");
-  Serial.println(temperaturaAr);
+  Serial.print(temperaturaAr);
+  Serial.println("C");
   
-  Serial.print("Temperatura do ar2 = ");
-  Serial.println(temperaturaAr2);
+  //Serial.print("Temperatura do ar2 = ");
+  //Serial.println(temperaturaAr2);
   
   Serial.print("Temperatura do solo = ");
-  Serial.println(temperaturaSolo);
+  Serial.print(temperaturaSolo);
+  Serial.println("C");
   
   Serial.print("Umidade do ar = ");
-  Serial.println(umidadeAr);
+  Serial.print(umidadeAr);
+  Serial.println("%");
   
   Serial.print("Umidade do solo = ");
-  Serial.println(umidadeSolo); */
+  Serial.print(umidadeSolo);
+  Serial.println("%");
   
   char buffer[10];
   String sep = ";";
@@ -146,7 +150,7 @@ void loop(void)
   dataString += sep;
   dataString += dtostrf(umidadeSolo, 4, 2, buffer);
   
-  Serial.println(dataString);
+  // Serial.println(dataString);
   Serial.println("=========================");
   // Serial.println("");
   
@@ -156,7 +160,7 @@ void loop(void)
   
   contador++;
   
-  delay(1500);
+  delay(3000);
 }
 
 float lerLuminosidadeSolar()
@@ -164,14 +168,28 @@ float lerLuminosidadeSolar()
   // 1023 = Sem luz / 0 = Com luz
   // 79 = Com laterna do cel
   // 1018 = Com fita isolante por cima
-  return analogRead(PINO_LUMINOSIDADE_SOLAR);
+  int valor = analogRead(PINO_LUMINOSIDADE_SOLAR);
+  
+  Serial.println(valor);
+  
+  float novoValor = map(valor, 79, 1018, 100, 0);
+  novoValor = max(novoValor, 0);
+  novoValor = min(novoValor, 100);
+  
+  return novoValor;
 }
 
 float lerMolhamentoFoliar()
 {
   // max 577/877
   // min 49/15
-  return analogRead(PINO_MOLHAMENTO_FOLIAR);
+  int valor = analogRead(PINO_MOLHAMENTO_FOLIAR);
+  
+  float novoValor = map(valor, 49, 555, 0, 100);
+  novoValor = max(novoValor, 0);
+  novoValor = min(novoValor, 100);
+  
+  return novoValor;
 }
 
 float lerTemperaturaAr()
@@ -286,9 +304,15 @@ float lerUmidadeAr()
   return dht.readHumidity();
 }
 
+// 0 / 403 / 380 = 100% umido
+// 702 / 687 = 0% umido
 float lerUmidadeSolo()
 {
-  // 0 = 100% umido
-  // 702 = 0% umido
-  return analogRead(PINO_HIGROMETRO);
+  int valor = analogRead(PINO_HIGROMETRO);
+  
+  float novoValor = map(valor, 380, 685, 100, 0);
+  novoValor = max(novoValor, 0);
+  novoValor = min(novoValor, 100);
+  
+  return novoValor;
 }
